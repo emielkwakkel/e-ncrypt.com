@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { Toolbar, ToolbarWidget } from '@angular/aria/toolbar';
 
@@ -19,6 +19,7 @@ import { Toolbar, ToolbarWidget } from '@angular/aria/toolbar';
             [value]="tab.path"
             [routerLink]="tab.path"
             routerLinkActive="nav-link-active"
+            [routerLinkActiveOptions]="tab.exact ? { exact: true } : { exact: false }"
             class="nav-link flex-1"
           >
             <span aria-hidden="true">{{ tab.icon }}</span>
@@ -31,8 +32,14 @@ import { Toolbar, ToolbarWidget } from '@angular/aria/toolbar';
 })
 export class TabNavComponent {
   protected readonly tabs = [
-    { path: '/encrypt', label: 'Encryption', icon: '🔒' },
-    { path: '/hash', label: 'Hashing', icon: '#️⃣' },
-    { path: '/settings', label: 'Settings', icon: '⚙️' },
+    { path: '/encrypt', label: 'Encrypt', icon: '🔒', exact: false },
+    { path: '/hash', label: 'Hash', icon: '#️⃣', exact: false },
+    { path: '/settings', label: 'Settings', icon: '⚙️', exact: true },
+    {
+      path: '/settings/about',
+      label: 'About',
+      icon: 'ℹ️',
+      exact: true,
+    },
   ];
 }

@@ -1,5 +1,5 @@
 import { Component, computed, effect, inject, model, signal } from '@angular/core';
-import { form, FormField, minLength, required, submit } from '@angular/forms/signals';
+import { form, FormField, minLength, required } from '@angular/forms/signals';
 import { Listbox, Option } from '@angular/aria/listbox';
 import { ClipboardService } from '../../core/services/clipboard.service';
 import { CryptoService } from '../../core/services/crypto.service';
@@ -180,7 +180,7 @@ export class EncryptComponent {
   }
 
   protected runEncrypt(): void {
-    void submit(this.encryptForm);
+    this.encryptForm().markAsTouched();
     if (!this.encryptForm().valid()) {
       return;
     }
@@ -202,7 +202,7 @@ export class EncryptComponent {
   }
 
   protected runDecrypt(): void {
-    void submit(this.encryptForm);
+    this.encryptForm().markAsTouched();
     if (!this.encryptForm().valid()) {
       return;
     }

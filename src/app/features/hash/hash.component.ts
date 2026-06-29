@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { form, FormField, required, submit } from '@angular/forms/signals';
+import { form, FormField, required } from '@angular/forms/signals';
 import { ClipboardService } from '../../core/services/clipboard.service';
 import { CryptoService } from '../../core/services/crypto.service';
 import { SettingsService } from '../../core/services/settings.service';
@@ -86,7 +86,7 @@ export class HashComponent {
   });
 
   protected runHash(): void {
-    void submit(this.hashForm);
+    this.hashForm().markAsTouched();
     if (!this.hashForm().valid()) {
       return;
     }

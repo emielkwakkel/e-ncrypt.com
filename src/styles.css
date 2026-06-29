@@ -28,7 +28,12 @@ body {
 
 /* Shared form + button styles (component styles are not processed by Tailwind) */
 .field-input {
-  @apply w-full rounded-xl border border-slate-200 bg-card px-3 py-2 text-sm shadow-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20 dark:border-slate-700 dark:bg-card-dark;
+  @apply w-full rounded-xl border border-slate-200 bg-card px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20 dark:border-slate-700 dark:bg-card-dark dark:text-slate-100;
+}
+
+.field-input::placeholder {
+  @apply text-muted;
+  opacity: 1;
 }
 
 .field-input-error {
@@ -61,6 +66,14 @@ body {
 
 .nav-link-active {
   @apply text-accent;
+}
+
+.header-nav-link {
+  @apply rounded-lg px-3 py-2 text-sm font-medium text-muted transition hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-slate-800 dark:hover:text-slate-100;
+}
+
+.header-nav-active {
+  @apply bg-accent/10 text-accent hover:bg-accent/10 hover:text-accent dark:bg-accent/20;
 }
 
 .listbox-option {

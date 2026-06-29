@@ -1,5 +1,4 @@
 import { Component, effect, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { Listbox, Option } from '@angular/aria/listbox';
 import {
   EncryptionAlgorithmOptions,
@@ -11,7 +10,7 @@ import { SettingsService } from '../../core/services/settings.service';
 
 @Component({
   selector: 'app-settings-panel',
-  imports: [Listbox, Option, RouterLink],
+  imports: [Listbox, Option],
   template: `
     <div class="flex h-full flex-col gap-6 overflow-y-auto p-4">
       <div>
@@ -112,15 +111,6 @@ import { SettingsService } from '../../core/services/settings.service';
             (change)="onDarkMode($event)"
           />
         </label>
-      </section>
-
-      <section class="space-y-2 border-t border-slate-200 pt-4 dark:border-slate-700">
-        <a
-          routerLink="/settings/about"
-          class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition hover:bg-slate-100 dark:hover:bg-slate-800"
-        >
-          About E-ncrypt
-        </a>
       </section>
     </div>
   `,
