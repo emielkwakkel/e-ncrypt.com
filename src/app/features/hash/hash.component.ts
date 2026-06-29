@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { form, FormField, required } from '@angular/forms/signals';
+import { AppIconComponent } from '../../core/icons/app-icon.component';
 import { ClipboardService } from '../../core/services/clipboard.service';
 import { CryptoService } from '../../core/services/crypto.service';
 import { SettingsService } from '../../core/services/settings.service';
@@ -10,11 +11,11 @@ interface HashModel {
 
 @Component({
   selector: 'app-hash',
-  imports: [FormField],
+  imports: [FormField, AppIconComponent],
   template: `
     <section class="mx-auto max-w-2xl space-y-6">
       <div>
-        <h1 class="text-2xl font-semibold text-balance">
+        <h1 class="flex items-center gap-2 text-2xl font-semibold text-balance">
           Hashing
           <span class="text-base font-normal text-muted">
             ({{ settings.hashingAlgorithm() }})
@@ -46,18 +47,20 @@ interface HashModel {
         <div class="grid gap-3 sm:grid-cols-2">
           <button
             type="button"
-            class="btn-secondary"
+            class="btn-secondary inline-flex items-center justify-center gap-2"
             [disabled]="!hashModel().content"
             (click)="copyContent()"
           >
+            <app-icon name="copy" class="size-4" />
             Copy content
           </button>
           <button
             type="button"
-            class="btn-primary"
+            class="btn-primary inline-flex items-center justify-center gap-2"
             [disabled]="!hashForm().valid()"
             (click)="runHash()"
           >
+            <app-icon name="hashnode" class="size-4" />
             Hash
           </button>
         </div>

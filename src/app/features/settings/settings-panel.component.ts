@@ -1,5 +1,6 @@
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, signal } from '@angular/core';
 import { Listbox, Option } from '@angular/aria/listbox';
+import { AppIconComponent } from '../../core/icons/app-icon.component';
 import {
   EncryptionAlgorithmOptions,
   EncryptionAlgorithms,
@@ -10,20 +11,30 @@ import { SettingsService } from '../../core/services/settings.service';
 
 @Component({
   selector: 'app-settings-panel',
-  imports: [Listbox, Option],
+  imports: [Listbox, Option, AppIconComponent],
   template: `
     <div class="flex h-full flex-col gap-6 overflow-y-auto p-4">
       <div>
-        <h2 class="text-lg font-semibold">Settings</h2>
-        <p class="text-sm text-muted">Configure algorithms and appearance.</p>
+        <h2 class="flex items-center gap-2 text-lg font-semibold">
+          <app-icon name="gear" class="size-5 text-accent" />
+          {{ panelTitle() }}
+        </h2>
+        <p class="text-sm text-muted">{{ panelDescription() }}</p>
       </div>
 
+      @if (showEncryption()) {
       <section class="space-y-3">
-        <h3 class="text-sm font-semibold uppercase tracking-wide text-muted">
+        <h3
+          class="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-muted"
+        >
+          <app-icon name="eyeSlash" class="size-4" />
           Encryption
         </h3>
 
-        <label class="block text-sm font-medium">Algorithm</label>
+        <label class="flex items-center gap-2 text-sm font-medium">
+          <app-icon name="squareBinary" class="size-4 text-muted" />
+          Algorithm
+        </label>
         <ul
           ngListbox
           [(value)]="encryptionSelection"
@@ -44,7 +55,8 @@ import { SettingsService } from '../../core/services/settings.service';
           }
         </ul>
 
-        <label class="block text-sm font-medium">
+        <label class="flex items-center gap-2 text-sm font-medium">
+          <app-icon name="arrowsRotate" class="size-4 text-muted" />
           Rounds: {{ settings.encryptionRounds() }}
         </label>
         <input
@@ -57,13 +69,21 @@ import { SettingsService } from '../../core/services/settings.service';
           (input)="onEncryptionRounds($event)"
         />
       </section>
+      }
 
+      @if (showHashing()) {
       <section class="space-y-3">
-        <h3 class="text-sm font-semibold uppercase tracking-wide text-muted">
+        <h3
+          class="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-muted"
+        >
+          <app-icon name="hashnode" class="size-4" />
           Hashing
         </h3>
 
-        <label class="block text-sm font-medium">Algorithm</label>
+        <label class="flex items-center gap-2 text-sm font-medium">
+          <app-icon name="squareBinary" class="size-4 text-muted" />
+          Algorithm
+        </label>
         <ul
           ngListbox
           [(value)]="hashingSelection"
@@ -84,7 +104,8 @@ import { SettingsService } from '../../core/services/settings.service';
           }
         </ul>
 
-        <label class="block text-sm font-medium">
+        <label class="flex items-center gap-2 text-sm font-medium">
+          <app-icon name="arrowsRotate" class="size-4 text-muted" />
           Rounds: {{ settings.hashingRounds() }}
         </label>
         <input
@@ -97,13 +118,21 @@ import { SettingsService } from '../../core/services/settings.service';
           (input)="onHashingRounds($event)"
         />
       </section>
+      }
 
+      @if (showAppearance()) {
       <section class="space-y-3">
-        <h3 class="text-sm font-semibold uppercase tracking-wide text-muted">
+        <h3
+          class="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-muted"
+        >
+          <app-icon name="circleHalfStroke" class="size-4" />
           Appearance
         </h3>
         <label class="flex items-center justify-between gap-3 text-sm">
-          <span>Dark mode</span>
+          <span class="flex items-center gap-2">
+            <app-icon name="circleHalfStroke" class="size-4 text-muted" />
+            Dark mode
+          </span>
           <input
             type="checkbox"
             class="size-5 accent-accent"
@@ -112,11 +141,36 @@ import { SettingsService } from '../../core/services/settings.service';
           />
         </label>
       </section>
+      }
     </div>
   `,
 })
 export class SettingsPanelComponent {
+  readonly showEncryption = input(true);
+  readonly showHashing = input(true);
+  readonly showAppearance = input(true);
+
   protected readonly settings = inject(SettingsService);
+
+  protected readonly panelTitle = computed(() => {
+    if (this.showEncryption() && !this.showHashing() && !this.showAppearance()) {
+      return 'Encryption settings';
+    }
+    if (this.showHashing() && !this.showEncryption() && !this.showAppearance()) {
+      return 'Hashing settings';
+    }
+    return 'Settings';
+  });
+
+  protected readonly panelDescription = computed(() => {
+    if (this.showEncryption() && !this.showHashing() && !this.showAppearance()) {
+      return 'Configure encryption algorithms.';
+    }
+    if (this.showHashing() && !this.showEncryption() && !this.showAppearance()) {
+      return 'Configure hashing algorithms.';
+    }
+    return 'Configure algorithms and appearance.';
+  });
 
   protected readonly encryptionOptions = [
     { value: EncryptionAlgorithms.AES, label: 'AES' },

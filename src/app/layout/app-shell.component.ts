@@ -1,6 +1,17 @@
 import { Component, computed, inject } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import {
+  NavigationEnd,
+  Router,
+  RouterLink,
+  RouterLinkActive,
+  RouterOutlet,
+} from '@angular/router';
+import { filter, map, startWith } from 'rxjs';
+import { AppIconComponent } from '../core/icons/app-icon.component';
+import { AppIconName } from '../core/icons/app-icons';
 import { ClipboardService } from '../core/services/clipboard.service';
+import { SettingsService } from '../core/services/settings.service';
 import { SettingsPanelComponent } from '../features/settings/settings-panel.component';
 import { PromoFooterComponent } from './promo-footer.component';
 import { TabNavComponent } from './tab-nav.component';
@@ -14,6 +25,7 @@ import { TabNavComponent } from './tab-nav.component';
     SettingsPanelComponent,
     TabNavComponent,
     PromoFooterComponent,
+    AppIconComponent,
   ],
   template: `
     <div class="flex min-h-dvh flex-col">
@@ -37,20 +49,34 @@ import { TabNavComponent } from './tab-nav.component';
             </div>
           </a>
 
-          <nav
-            class="hidden items-center gap-1 lg:flex"
-            aria-label="Main navigation"
-          >
-            @for (link of navLinks; track link.path) {
-              <a
-                [routerLink]="link.path"
-                routerLinkActive="header-nav-active"
-                class="header-nav-link"
-              >
-                {{ link.label }}
-              </a>
-            }
-          </nav>
+          <div class="hidden items-center gap-1 lg:flex">
+            <nav aria-label="Main navigation" class="flex items-center gap-1">
+              @for (link of navLinks; track link.path) {
+                <a
+                  [routerLink]="link.path"
+                  routerLinkActive="header-nav-active"
+                  class="header-nav-link inline-flex items-center gap-2"
+                >
+                  <app-icon [name]="link.icon" class="size-4" />
+                  {{ link.label }}
+                </a>
+              }
+            </nav>
+
+            <button
+              type="button"
+              class="header-nav-link inline-flex items-center gap-2"
+              [class.header-nav-active]="settings.darkMode()"
+              [attr.aria-label]="
+                settings.darkMode() ? 'Switch to light mode' : 'Switch to dark mode'
+              "
+              [attr.aria-pressed]="settings.darkMode()"
+              (click)="toggleDarkMode()"
+            >
+              <app-icon name="circleHalfStroke" class="size-4" />
+              Dark mode
+            </button>
+          </div>
         </div>
       </header>
 
@@ -67,12 +93,29 @@ import { TabNavComponent } from './tab-nav.component';
           <app-tab-nav class="lg:hidden" />
         </main>
 
-        @if (!isAboutPage()) {
-          <aside
-            class="hidden w-full max-w-md border-l border-slate-200 dark:border-slate-700 lg:block"
-          >
-            <app-settings-panel />
-          </aside>
+        @switch (settingsAsideMode()) {
+          @case ('encryption') {
+            <aside
+              class="hidden w-full max-w-md border-l border-slate-200 dark:border-slate-700 lg:block"
+            >
+              <app-settings-panel
+                [showEncryption]="true"
+                [showHashing]="false"
+                [showAppearance]="false"
+              />
+            </aside>
+          }
+          @case ('hashing') {
+            <aside
+              class="hidden w-full max-w-md border-l border-slate-200 dark:border-slate-700 lg:block"
+            >
+              <app-settings-panel
+                [showEncryption]="false"
+                [showHashing]="true"
+                [showAppearance]="false"
+              />
+            </aside>
+          }
         }
       </div>
 
@@ -93,16 +136,26 @@ import { TabNavComponent } from './tab-nav.component';
 })
 export class AppShellComponent {
   protected readonly clipboard = inject(ClipboardService);
+  protected readonly settings = inject(SettingsService);
   private readonly router = inject(Router);
 
-  protected readonly navLinks = [
-    { path: '/encrypt', label: 'Encryption' },
-    { path: '/hash', label: 'Hashing' },
-    { path: '/settings/about', label: 'About' },
+  private readonly currentUrl = toSignal(
+    this.router.events.pipe(
+      filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+      map(() => this.router.url),
+      startWith(this.router.url),
+    ),
+    { initialValue: this.router.url },
+  );
+
+  protected readonly navLinks: { path: string; label: string; icon: AppIconName }[] = [
+    { path: '/encrypt', label: 'Encryption', icon: 'eyeSlash' },
+    { path: '/hash', label: 'Hashing', icon: 'hashnode' },
+    { path: '/settings/about', label: 'About', icon: 'gitAlt' },
   ];
 
   protected readonly pageTitle = computed(() => {
-    const url = this.router.url;
+    const url = this.currentUrl();
     if (url.startsWith('/settings/about')) {
       return 'About';
     }
@@ -116,6 +169,21 @@ export class AppShellComponent {
   });
 
   protected readonly isAboutPage = computed(() =>
-    this.router.url.startsWith('/settings/about'),
+    this.currentUrl().startsWith('/settings/about'),
   );
+
+  protected readonly settingsAsideMode = computed(() => {
+    const url = this.currentUrl();
+    if (url.startsWith('/hash')) {
+      return 'hashing' as const;
+    }
+    if (url.startsWith('/encrypt') || url === '/' || url.startsWith('/?')) {
+      return 'encryption' as const;
+    }
+    return null;
+  });
+
+  protected toggleDarkMode(): void {
+    this.settings.setDarkModeEnabled(!this.settings.darkMode());
+  }
 }

@@ -1,6 +1,7 @@
 import { Component, computed, effect, inject, model, signal } from '@angular/core';
 import { form, FormField, minLength, required } from '@angular/forms/signals';
 import { Listbox, Option } from '@angular/aria/listbox';
+import { AppIconComponent } from '../../core/icons/app-icon.component';
 import { ClipboardService } from '../../core/services/clipboard.service';
 import { CryptoService } from '../../core/services/crypto.service';
 import { SettingsService } from '../../core/services/settings.service';
@@ -15,11 +16,11 @@ interface EncryptModel {
 
 @Component({
   selector: 'app-encrypt',
-  imports: [FormField, Listbox, Option],
+  imports: [FormField, Listbox, Option, AppIconComponent],
   template: `
     <section class="mx-auto max-w-2xl space-y-6">
       <div>
-        <h1 class="text-2xl font-semibold text-balance">
+        <h1 class="flex items-center gap-2 text-2xl font-semibold text-balance">
           Encryption
           <span class="text-base font-normal text-muted">
             ({{ settings.encryptionAlgorithm() }})
@@ -43,18 +44,20 @@ interface EncryptModel {
           ngOption
           value="encrypt"
           label="Encrypt"
-          class="mode-toggle"
+          class="mode-toggle inline-flex items-center gap-2"
           [class.mode-toggle-active]="encryptModel().mode === 'encrypt'"
         >
+          <app-icon name="eyeSlash" class="size-4" />
           Encrypt
         </li>
         <li
           ngOption
           value="decrypt"
           label="Decrypt"
-          class="mode-toggle"
+          class="mode-toggle inline-flex items-center gap-2"
           [class.mode-toggle-active]="encryptModel().mode === 'decrypt'"
         >
+          <app-icon name="eye" class="size-4" />
           Decrypt
         </li>
       </ul>
@@ -101,29 +104,32 @@ interface EncryptModel {
         <div class="grid gap-3 sm:grid-cols-2">
           <button
             type="button"
-            class="btn-secondary"
+            class="btn-secondary inline-flex items-center justify-center gap-2"
             [disabled]="!encryptModel().content"
             (click)="copyContent()"
           >
+            <app-icon name="copy" class="size-4" />
             Copy content
           </button>
 
           @if (encryptModel().mode === 'encrypt') {
             <button
               type="button"
-              class="btn-primary"
+              class="btn-primary inline-flex items-center justify-center gap-2"
               [disabled]="!encryptForm().valid()"
               (click)="runEncrypt()"
             >
+              <app-icon name="eyeSlash" class="size-4" />
               Encrypt
             </button>
           } @else {
             <button
               type="button"
-              class="btn-danger"
+              class="btn-danger inline-flex items-center justify-center gap-2"
               [disabled]="!encryptForm().valid()"
               (click)="runDecrypt()"
             >
+              <app-icon name="eye" class="size-4" />
               Decrypt
             </button>
           }

@@ -6,7 +6,11 @@ import { SettingsPanelComponent } from './settings-panel.component';
   imports: [SettingsPanelComponent],
   template: `
     <div class="lg:hidden">
-      <app-settings-panel />
+      <app-settings-panel
+        [showEncryption]="true"
+        [showHashing]="true"
+        [showAppearance]="true"
+      />
     </div>
   `,
 })

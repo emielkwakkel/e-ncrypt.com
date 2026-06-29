@@ -1,10 +1,12 @@
 import { Component } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { Toolbar, ToolbarWidget } from '@angular/aria/toolbar';
+import { AppIconComponent } from '../core/icons/app-icon.component';
+import { AppIconName } from '../core/icons/app-icons';
 
 @Component({
   selector: 'app-tab-nav',
-  imports: [Toolbar, ToolbarWidget, RouterLink, RouterLinkActive],
+  imports: [Toolbar, ToolbarWidget, RouterLink, RouterLinkActive, AppIconComponent],
   template: `
     <nav
       ngToolbar
@@ -22,7 +24,7 @@ import { Toolbar, ToolbarWidget } from '@angular/aria/toolbar';
             [routerLinkActiveOptions]="tab.exact ? { exact: true } : { exact: false }"
             class="nav-link flex-1"
           >
-            <span aria-hidden="true">{{ tab.icon }}</span>
+            <app-icon [name]="tab.icon" class="size-5" />
             {{ tab.label }}
           </a>
         }
@@ -31,15 +33,15 @@ import { Toolbar, ToolbarWidget } from '@angular/aria/toolbar';
   `,
 })
 export class TabNavComponent {
-  protected readonly tabs = [
-    { path: '/encrypt', label: 'Encrypt', icon: '🔒', exact: false },
-    { path: '/hash', label: 'Hash', icon: '#️⃣', exact: false },
-    { path: '/settings', label: 'Settings', icon: '⚙️', exact: true },
-    {
-      path: '/settings/about',
-      label: 'About',
-      icon: 'ℹ️',
-      exact: true,
-    },
+  protected readonly tabs: {
+    path: string;
+    label: string;
+    icon: AppIconName;
+    exact: boolean;
+  }[] = [
+    { path: '/encrypt', label: 'Encrypt', icon: 'eyeSlash', exact: false },
+    { path: '/hash', label: 'Hash', icon: 'hashnode', exact: false },
+    { path: '/settings', label: 'Settings', icon: 'gear', exact: true },
+    { path: '/settings/about', label: 'About', icon: 'gitAlt', exact: true },
   ];
 }
